@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roue des jeux moddés</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #12141c;
+      --fg: #f4f1ea;
+      --muted: #9a958c;
+      --line: #2a2e3a;
+      --mario: #3b82f6;
+      --kart: #22d3ee;
+      --party: #a855f7;
+      --adv: #e879f9;
+      --zelda: #d97706;
+      --smash: #fb923c;
+      --other: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.4 "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px 48px;
+    }
+    main {
+      width: min(100%, 520px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+    #pick {
+      margin: 0;
+      min-height: 3.2em;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 650;
+    }
+    .stage {
+      width: min(100%, 420px);
+      aspect-ratio: 1;
+    }
+    svg { width: 100%; height: 100%; display: block; }
+    .rotor { transform-box: fill-box; transform-origin: center; }
+    .rotor.is-spinning { transition: transform 4.6s cubic-bezier(0.12, 0.68, 0.08, 1); }
+    .seg { stroke: var(--bg); stroke-width: 1; }
+    .tone-mario { fill: var(--mario); }
+    .tone-kart { fill: var(--kart); }
+    .tone-party { fill: var(--party); }
+    .tone-adv { fill: var(--adv); }
+    .tone-zelda { fill: var(--zelda); }
+    .tone-smash { fill: var(--smash); }
+    .tone-other { fill: var(--other); }
+    .pointer { fill: var(--fg); }
+    button {
+      appearance: none;
+      border: 0;
+      background: var(--fg);
+      color: var(--bg);
+      font: inherit;
+      font-weight: 650;
+      padding: 12px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    button:disabled { cursor: wait; opacity: 0.7; }
+    button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 14px;
+      margin: 0;
+      padding: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    li { display: flex; align-items: center; gap: 6px; }
+    i {
+      width: 10px;
+      height: 10px;
+      display: block;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rotor { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Roue des jeux moddés</h1>
+    <p id="pick" aria-live="polite">Super Mario Bros. 3</p>
+    <div class="stage">
+      <svg viewBox="0 0 300 300" role="img" aria-label="Roue des jeux moddés">
+        <g id="rotor" class="rotor"></g>
+        <polygon class="pointer" points="141,4 159,4 150,26"></polygon>
+      </svg>
+    </div>
+    <button type="button" id="spin">Lancer la roue</button>
+    <ul aria-label="Familles de jeux">
+      <li><i class="tone-mario"></i>Super Mario</li>
+      <li><i class="tone-kart"></i>Mario Kart</li>
+      <li><i class="tone-party"></i>Party et sport</li>
+      <li><i class="tone-adv"></i>Aventures</li>
+      <li><i class="tone-zelda"></i>Zelda</li>
+      <li><i class="tone-smash"></i>Smash Bros.</li>
+      <li><i class="tone-other"></i>Autres</li>
+    </ul>
+  </main>
+  <script>
+    (function () {
+      var rotor = document.getElementById("rotor");
+      var pick = document.getElementById("pick");
+      var button = document.getElementById("spin");
+      var games = [
+        ["Super Mario Bros. 3", "mario"],
+        ["Super Mario Advance 4: Super Mario Bros. 3", "mario"],
+        ["Super Mario 64", "mario"],
+        ["Super Mario Sunshine", "mario"],
+        ["New Super Mario Bros.", "mario"],
+        ["Super Mario Galaxy", "mario"],
+        ["New Super Mario Bros. Wii", "mario"],
+        ["Super Mario 3D Land", "mario"],
+        ["New Super Mario Bros. 2", "mario"],
+        ["New Super Mario Bros. U", "mario"],
+        ["Super Mario 3D World", "mario"],
+        ["Super Mario Maker (Wii U / 3DS)", "mario"],
+        ["Super Mario Odyssey", "mario"],
+        ["New Super Mario Bros. U Deluxe", "mario"],
+        ["Super Mario Maker 2", "mario"],
+        ["Super Mario Bros. 35", "mario"],
+        ["Super Mario 3D World + Bowser's Fury", "mario"],
+        ["Super Mario Bros. Wonder", "mario"],
+        ["Mario Kart 64", "kart"],
+        ["Mario Kart: Double Dash!!", "kart"],
+        ["Mario Kart DS", "kart"],
+        ["Mario Kart Wii", "kart"],
+        ["Mario Kart 7", "kart"],
+        ["Mario Kart 8", "kart"],
+        ["Mario Kart 8 Deluxe", "kart"],
+        ["Mario Kart World", "kart"],
+        ["Mario Party 8", "party"],
+        ["Mario Party 9", "party"],
+        ["Mario Party: Star Rush", "party"],
+        ["Super Mario Party", "party"],
+        ["Mario Party Superstars", "party"],
+        ["Super Mario Party Jamboree", "party"],
+        ["Wii Party", "party"],
+        ["Mario Sports Mix", "party"],
+        ["Mario Tennis Open", "party"],
+        ["Mario Tennis: Ultra Smash", "party"],
+        ["Mario Tennis Aces", "party"],
+        ["Mario vs. Donkey Kong", "party"],
+        ["Wii Sports", "party"],
+        ["Wii Sports Resort", "party"],
+        ["Paper Mario: The Thousand-Year Door", "adv"],
+        ["Paper Mario: Sticker Star", "adv"],
+        ["Paper Mario: Color Splash", "adv"],
+        ["Paper Mario: The Origami King", "adv"],
+        ["Luigi's Mansion", "adv"],
+        ["Luigi's Mansion 2", "adv"],
+        ["Luigi's Mansion 2 HD", "adv"],
+        ["Captain Toad: Treasure Tracker", "adv"],
+        ["Donkey Kong Bananza", "adv"],
+        ["The Legend of Zelda: Ocarina of Time", "zelda"],
+        ["The Legend of Zelda: Majora's Mask 3D", "zelda"],
+        ["The Legend of Zelda: Twilight Princess", "zelda"],
+        ["The Legend of Zelda: Skyward Sword HD", "zelda"],
+        ["The Legend of Zelda: Breath of the Wild", "zelda"],
+        ["Super Smash Bros. Melee", "smash"],
+        ["Super Smash Bros. Brawl", "smash"],
+        ["Super Smash Bros. for Nintendo 3DS", "smash"],
+        ["Super Smash Bros. for Wii U", "smash"],
+        ["Super Smash Bros. Ultimate", "smash"],
+        ["Animal Crossing: City Folk", "other"],
+        ["Animal Crossing: New Leaf", "other"],
+        ["Animal Crossing: New Horizons", "other"],
+        ["Miitopia", "other"],
+        ["Tomodachi Life", "other"],
+        ["Tomodachi Life: Living the Dream", "other"],
+        ["StreetPass Mii Plaza", "other"],
+        ["Splatoon", "other"],
+        ["Splatoon 2", "other"],
+        ["Angry Birds Trilogy", "other"],
+        ["Bienvenue chez les Ch'tis", "other"],
+        ["Face Raiders", "other"],
+        ["Godzilla: Unleashed", "other"],
+        ["Minecraft: Wii U Edition", "other"],
+        ["Yo-kai Watch", "other"],
+        ["Menu Home Nintendo 3DS", "other"],
+        ["Vidéos Nintendo 3DS", "other"]
+      ];
+      var n = games.length;
+      var slice = 360 / n;
+      var cx = 150;
+      var cy = 150;
+      var rOut = 136;
+      var rIn = 68;
+      var rotation = -slice / 2;
+      var spinning = false;
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var ns = "http://www.w3.org/2000/svg";
+
+      function polar(angle, radius) {
+        var rad = (angle - 90) * Math.PI / 180;
+        return [cx + radius * Math.cos(rad), cy + radius * Math.sin(rad)];
+      }
+
+      function point(pair) {
+        return pair[0].toFixed(2) + " " + pair[1].toFixed(2);
+      }
+
+      for (var i = 0; i < n; i++) {
+        var a0 = i * slice;
+        var a1 = (i + 1) * slice;
+        var d = "M " + point(polar(a0, rOut))
+          + " A " + rOut + " " + rOut + " 0 0 1 " + point(polar(a1, rOut))
+          + " L " + point(polar(a1, rIn))
+          + " A " + rIn + " " + rIn + " 0 0 0 " + point(polar(a0, rIn))
+          + " Z";
+        var path = document.createElementNS(ns, "path");
+        path.setAttribute("d", d);
+        path.setAttribute("class", "seg tone-" + games[i][1]);
+        var title = document.createElementNS(ns, "title");
+        title.textContent = games[i][0];
+        path.appendChild(title);
+        rotor.appendChild(path);
+      }
+
+      rotor.style.transform = "rotate(" + rotation.toFixed(3) + "deg)";
+
+      function norm(deg) {
+        return ((deg % 360) + 360) % 360;
+      }
+
+      function finish(name) {
+        spinning = false;
+        button.disabled = false;
+        button.textContent = "Lancer la roue";
+        pick.textContent = name;
+      }
+
+      button.addEventListener("click", function () {
+        if (spinning) return;
+        spinning = true;
+        button.disabled = true;
+        button.textContent = "Ça tourne";
+        var index = Math.floor(Math.random() * n);
+        var target = -((index + 0.5) * slice);
+        var delta = norm(target) - norm(rotation);
+        if (delta <= 0) delta += 360;
+        delta += 360 * 5;
+        rotation += delta;
+        var name = games[index][0];
+        if (reduce.matches) {
+          rotor.classList.remove("is-spinning");
+          rotor.style.transform = "rotate(" + rotation.toFixed(3) + "deg)";
+          finish(name);
+          return;
+        }
+        var settled = false;
+        function done() {
+          if (settled) return;
+          settled = true;
+          rotor.classList.remove("is-spinning");
+          finish(name);
+        }
+        rotor.addEventListener("transitionend", function onEnd(event) {
+          if (event.propertyName !== "transform") return;
+          rotor.removeEventListener("transitionend", onEnd);
+          done();
+        });
+        window.setTimeout(done, 5200);
+        rotor.classList.add("is-spinning");
+        void rotor.getBoundingClientRect();
+        rotor.style.transform = "rotate(" + rotation.toFixed(3) + "deg)";
+      });
+    })();
+  </script>
+</body>
+</html>
